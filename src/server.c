@@ -9,11 +9,17 @@
 #include "printf.h"
 #include "chat.h"
 
+static void prompt(void)
+{
+    my_putstr("$> ");
+}
+
 char *get_input(void)
 {
     char *input = NULL;
     size_t size = 0;
-    getline(&input, &size, stdin);
+    ssize_t i = getline(&input, &size, stdin);
+    input[i - 1] = '\0';
     return input;
 }
 
@@ -23,9 +29,10 @@ int server(void)
     int connfd = 0;
     struct sockaddr_in serv_addr;
     char sendBuff[1025];
+    char **input_array;
 
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
-    printf("socket retrieve success\n");
+    printf("Socket retrieve success...\n");
     memset(&serv_addr, '0', sizeof(serv_addr));
     memset(sendBuff, '0', sizeof(sendBuff));
 
@@ -38,15 +45,26 @@ int server(void)
         printf("Failed to listen\n");
         return -1;
     } else
-        printf("Now listening on port %i\n", serv_addr.sin_port);
+        printf("Now listening on port 9001...\n");
 
     while (connfd == 0) {
         connfd = accept(listenfd, (struct sockaddr*)NULL ,NULL);
     }
-    printf("User connected\n");
+    printf("%i is connected...\n", connfd);
     while (1) {
-        strcpy(sendBuff, get_input());
-        write(connfd, sendBuff, strlen(sendBuff));
+        prompt();
+        input_array = my_str_to_word_array(get_input(), ' ');
+        if (my_strcmp(input_array[0], "say") == 0) {
+            say(input_array[1], connfd, sendBuff);
+        } else if (my_strcmp(input_array[0], "kick") == 0)
+            kick(connfd, sendBuff);
+        else if (my_strcmp(input_array[0], "help") == 0)
+            help();
+        else if (my_strcmp(input_array[0], "exit") == 0) {
+            leave(connfd, sendBuff);
+            break;
+        } else
+            printf("Unknown command '%s'\n", input_array[0]);
     }
     close(connfd);
     return 0;

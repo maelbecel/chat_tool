@@ -10,34 +10,41 @@
 #include "chat.h"
 
 int client(int port) {
-    int sockfd = 0,n = 0;
+    int sockfd = 0;
+    int n = 0;
     char recvBuff[1024];
     struct sockaddr_in serv_addr;
+    char *ip = "127.0.0.1";
 
     memset(recvBuff, '0',sizeof(recvBuff));
     if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        printf("\n Error : Could not create socket \n");
+        printf("Error : Could not create socket...\n");
         return 1;
     } else
         printf("\n Socket created \n");
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
-    serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serv_addr.sin_addr.s_addr = inet_addr(ip);
 
-    if(connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-        printf("\n Error : Connect Failed \n");
+    if(serv_addr.sin_addr.s_addr == ( in_addr_t)(-1) ||
+        connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+        printf("Error : Connect Failed...\n");
         return 1;
     } else
-        printf("\n Connected to %i\n", serv_addr.sin_addr.s_addr);
+        printf("Connected to %i as %s...\n\n", serv_addr.sin_addr.s_addr, ip);
     while(1) {
         n = read(sockfd, recvBuff, sizeof(recvBuff)-1);
         recvBuff[n] = 0;
-        if(fputs(recvBuff, stdout) == EOF)
-            printf("\n Error : Fputs error");
-        if (recvBuff[0] != '\0')
-            printf("\n Recieve : %s", recvBuff);
+        if (recvBuff[0] != '\0') {
+            if (my_getnbr(recvBuff) == KICK) {
+                my_printf("\e[1;33mBye bye\n");
+                break;
+            } if (my_getnbr(recvBuff) == SERVER_CLOSED) {
+                my_printf("\e[1;31mServer closed\n");
+                break;
+            }
+            my_printf("\e[1;33mSERVER -> %s\n\e[0m", recvBuff);
+        }
     }
-    if( n < 0)
-        printf("\n Read Error \n");
     return 0;
 }

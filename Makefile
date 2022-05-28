@@ -13,8 +13,9 @@ CFLAGS      +=         -Wall -Wextra -Werror -fvisibility=hidden $(INCLUDE)
 
 SOURCES      =         src/
 
-SRC          =         $(SOURCES)main.c         \
-					   $(SOURCES)server.c       \
+SRC          =         $(SOURCES)main.c        		\
+					   $(SOURCES)server.c			\
+					   $(SOURCES)builtins.c	       	\
 					   $(SOURCES)client.c
 
 SRC_COUNT    =         $(words $(SRC))
