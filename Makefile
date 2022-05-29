@@ -15,6 +15,8 @@ SOURCES      =         src/
 
 SRC          =         $(SOURCES)main.c        		\
 					   $(SOURCES)server.c			\
+					   $(SOURCES)ascii.c			\
+					   $(SOURCES)str_array.c		\
 					   $(SOURCES)builtins.c	       	\
 					   $(SOURCES)client.c
 
