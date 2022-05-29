@@ -23,6 +23,7 @@ void kick(int fd, char sendBuff[1025])
 void leave(int fd, char sendBuff[1025])
 {
     say(inttochar(SERVER_CLOSED), fd, sendBuff);
+    _ascii_close();
 }
 
 void help(void)

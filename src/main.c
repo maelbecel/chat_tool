@@ -11,13 +11,14 @@
 
 int select_type(char **argv)
 {
-    
+    char **ip_port;
+
     if (my_strcmp(argv[1], "-server") == 0)
         server();
-    else if (my_strcmp(argv[1], "-client") == 0 && argv[2] != NULL)
-        client(my_getnbr(argv[2]));
-    else {
-        printf("Type must be server or client with port\n");
+    else if (my_strcmp(argv[1], "-client") == 0 && argv[2] != NULL && (ip_port = my_str_to_word_array(argv[2], ':')) != NULL && ip_port[1] != NULL) {
+        client(my_getnbr(ip_port[1]), ip_port[0]);
+    } else {
+        printf("Type must be server or client with pip:port\n");
         return 84;
     }
     return 0;
